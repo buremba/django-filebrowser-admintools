@@ -1,0 +1,63 @@
+### B2c ###
+.idea/*.iws
+.idea/workspace.xml
+.idea/tasks.xml
+static/*
+logs/dump.log.*
+settings_local.py
+
+### Django ###
+*.log
+*.pot
+*.pyc
+
+### Python ###
+*.py[cod]
+
+# C extensions
+*.so
+
+# OS generated files #
+######################
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+thumbs.db
+Thumbs.db
+
+# Packages
+*.egg
+*.egg-info
+dist
+build
+eggs
+parts
+bin
+var
+sdist
+develop-eggs
+.installed.cfg
+lib
+lib64
+__pycache__
+
+# Installer logs
+pip-log.txt
+
+# Unit test / coverage reports
+.coverage
+.tox
+nosetests.xml
+
+# Translations
+*.mo
+
+# Mr Developer
+.mr.developer.cfg
+.project
+.pydevproject
+
+# Rope
+.ropeproject
