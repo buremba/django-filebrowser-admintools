@@ -4,4 +4,4 @@ recursive-include filebrowser *.py
 recursive-include filebrowser/templates *.html
 recursive-include filebrowser/locale *.po
 recursive-include filebrowser/locale *.mo
-recursive-include filebrowser/media *.*
+recursive-include filebrowser/static *.*
