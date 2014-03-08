@@ -45,13 +45,16 @@ class VersionNode(Node):
                 return self.default(context)
         try:
             source = force_unicode(source)
-            version_path = get_version_path(url_to_path(source), version_prefix)
-            if not os.path.isfile(smart_str(os.path.join(fb_settings.MEDIA_ROOT, version_path))):
-                # create version
-                version_path = version_generator(url_to_path(source), version_prefix)
-            elif os.path.getmtime(smart_str(os.path.join(fb_settings.MEDIA_ROOT, url_to_path(source)))) > os.path.getmtime(smart_str(os.path.join(fb_settings.MEDIA_ROOT, version_path))):
-                # recreate version if original image was updated
-                version_path = version_generator(url_to_path(source), version_prefix, force=True)
+            if self.version_prefix is not None:
+                version_path = get_version_path(url_to_path(source), version_prefix)
+                if not os.path.isfile(smart_str(os.path.join(fb_settings.MEDIA_ROOT, version_path))):
+                    # create version
+                    version_path = version_generator(url_to_path(source), version_prefix)
+                elif os.path.getmtime(smart_str(os.path.join(fb_settings.MEDIA_ROOT, url_to_path(source)))) > os.path.getmtime(smart_str(os.path.join(fb_settings.MEDIA_ROOT, version_path))):
+                    # recreate version if original image was updated
+                    version_path = version_generator(url_to_path(source), version_prefix, force=True)
+            else:
+                return path_to_url(source)
             return path_to_url(version_path)
         except Exception as e:
             logger.error(e)
@@ -69,10 +72,10 @@ def version(parser, token):
     """
     Displaying a version of an existing Image according to the predefined VERSIONS settings (see filebrowser settings).
     {% version field_name version_prefix %}
-    
+
     Use {% version my_image 'medium' %} in order to display the medium-size
     version of an Image stored in a field name my_image.
-    
+
     version_prefix can be a string or a variable. if version_prefix is a string, use quotes.
     """
 
@@ -130,12 +133,12 @@ def version_object(parser, token):
     """
     Returns a context variable 'version_object'.
     {% version_object field_name version_prefix %}
-    
+
     Use {% version_object my_image 'medium' %} in order to retrieve the medium
     version of an Image stored in a field name my_image.
     Use {% version_object my_image 'medium' as var %} in order to use 'var' as
     your context variable.
-    
+
     version_prefix can be a string or a variable. if version_prefix is a string, use quotes.
     """
 
@@ -190,5 +193,3 @@ def version_setting(parser, token):
 register.tag(version)
 register.tag(version_object)
 register.tag(version_setting)
-
-
