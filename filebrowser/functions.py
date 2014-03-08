@@ -5,6 +5,8 @@ import logging
 import os
 import re
 from time import gmtime, strftime, localtime, time
+from django.core.validators import URLValidator
+from django.core.exceptions import ValidationError
 
 
 # django imports
@@ -76,32 +78,35 @@ def get_version_path(value, version_prefix):
     version_filename = filename + version_prefix + ext
     Returns a path relative to MEDIA_ROOT.
     """
-
-    if os.path.isfile(smart_str(os.path.join(fb_settings.MEDIA_ROOT, value))):
-        path, filename = os.path.split(value)
-        filename, ext = os.path.splitext(filename)
-
-        # check if this file is a version of an other file
-        # to return filename_<version>.ext instead of filename_<version>_<version>.ext
-        tmp = filename.split("_")
-        if tmp[len(tmp) - 1] in ADMIN_VERSIONS:
-            # it seems like the "original" is actually a version of an other original
-            # so we strip the suffix (aka. version_perfix)
-            new_filename = filename.replace("_" + tmp[len(tmp) - 1], "")
-            # check if the version exists when we use the new_filename
-            if os.path.isfile(smart_str(os.path.join(fb_settings.MEDIA_ROOT, path, new_filename + "_" + version_prefix + ext))):
-                # our "original" filename seem to be filename_<version> construct
-                # so we replace it with the new_filename
-                filename = new_filename
-                # if a VERSIONS_BASEDIR is set we need to strip it from the path
-                # or we get a <VERSIONS_BASEDIR>/<VERSIONS_BASEDIR>/... construct
-                if VERSIONS_BASEDIR != "":
-                    path = path.replace(VERSIONS_BASEDIR + "/", "")
-
-        version_filename = filename + "_" + version_prefix + ext
-        return os.path.join(VERSIONS_BASEDIR, path, version_filename)
-    else:
-        return None
+    validate = URLValidator(verify_exists=True)
+    try:
+        validate(value)
+    except ValidationError, e:
+        if os.path.isfile(smart_str(os.path.join(fb_settings.MEDIA_ROOT, value))):
+            path, filename = os.path.split(value)
+            filename, ext = os.path.splitext(filename)
+    
+            # check if this file is a version of an other file
+            # to return filename_<version>.ext instead of filename_<version>_<version>.ext
+            tmp = filename.split("_")
+            if tmp[len(tmp) - 1] in ADMIN_VERSIONS:
+                # it seems like the "original" is actually a version of an other original
+                # so we strip the suffix (aka. version_perfix)
+                new_filename = filename.replace("_" + tmp[len(tmp) - 1], "")
+                # check if the version exists when we use the new_filename
+                if os.path.isfile(smart_str(os.path.join(fb_settings.MEDIA_ROOT, path, new_filename + "_" + version_prefix + ext))):
+                    # our "original" filename seem to be filename_<version> construct
+                    # so we replace it with the new_filename
+                    filename = new_filename
+                    # if a VERSIONS_BASEDIR is set we need to strip it from the path
+                    # or we get a <VERSIONS_BASEDIR>/<VERSIONS_BASEDIR>/... construct
+                    if VERSIONS_BASEDIR != "":
+                        path = path.replace(VERSIONS_BASEDIR + "/", "")
+    
+            version_filename = filename + "_" + version_prefix + ext
+            return os.path.join(VERSIONS_BASEDIR, path, version_filename)
+        else:
+            return None
 
 
 def sort_by_attr(seq, attr):
