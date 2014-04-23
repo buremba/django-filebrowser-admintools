@@ -36,28 +36,26 @@ class VersionNode(Node):
             source = self.src.resolve(context)
         except VariableDoesNotExist:
             return self.default(context)
-        if self.version_prefix:
-            version_prefix = self.version_prefix
-        else:
+        if not self.version_prefix:
             try:
-                version_prefix = self.version_prefix_var.resolve(context)
+                self.version_prefix = self.version_prefix_var.resolve(context)
             except VariableDoesNotExist:
                 return self.default(context)
         try:
             source = force_unicode(source)
             if self.version_prefix is not None:
-                version_path = get_version_path(url_to_path(source), version_prefix)
+                version_path = get_version_path(url_to_path(source), self.version_prefix)
                 if not os.path.isfile(smart_str(os.path.join(fb_settings.MEDIA_ROOT, version_path))):
                     # create version
-                    version_path = version_generator(url_to_path(source), version_prefix)
+                    version_path = version_generator(url_to_path(source), self.version_prefix)
                 elif os.path.getmtime(smart_str(os.path.join(fb_settings.MEDIA_ROOT, url_to_path(source)))) > os.path.getmtime(smart_str(os.path.join(fb_settings.MEDIA_ROOT, version_path))):
                     # recreate version if original image was updated
-                    version_path = version_generator(url_to_path(source), version_prefix, force=True)
+                    version_path = version_generator(url_to_path(source), self.version_prefix, force=True)
             else:
                 return path_to_url(source)
             return path_to_url(version_path)
         except Exception as e:
-            logger.error(e)
+            logger.info(e)
             return self.default(context)
 
     def default(self, context):
@@ -158,7 +156,7 @@ def version_object(parser, token):
 
 class VersionSettingNode(Node):
     def __init__(self, version_prefix):
-        if (version_prefix[0] == version_prefix[-1] and version_prefix[0] in ('"', "'")):
+        if version_prefix[0] == version_prefix[-1] and version_prefix[0] in ('"', "'"):
             self.version_prefix = version_prefix[1:-1]
         else:
             self.version_prefix = None

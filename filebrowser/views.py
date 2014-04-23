@@ -18,14 +18,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.dispatch import Signal
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.utils.encoding import smart_str
-
-try:
-    # django SVN
-    from django.views.decorators.csrf import csrf_exempt
-except:
-    # django 1.1
-    from django.contrib.csrf.middleware import csrf_exempt
-
+from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
 
 # filebrowser imports
