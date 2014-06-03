@@ -44,7 +44,7 @@ def url_to_path(value):
     Returns a PATH relative to MEDIA_ROOT.
     """
     if value is None:
-        return None
+        return ""
     mediaurl_re = re.compile(r'^(%s)' % (fb_settings.MEDIA_URL))
     value = mediaurl_re.sub('', value)
     return value
