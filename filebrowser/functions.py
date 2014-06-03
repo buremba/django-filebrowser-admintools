@@ -57,7 +57,8 @@ def path_to_url(value):
     
     Return an URL relative to MEDIA_ROOT.
     """
-
+    if value is None:
+        return ""
     mediaroot_re = re.compile(r'^(%s)' % (fb_settings.MEDIA_ROOT))
     value = mediaroot_re.sub('', value)
     return url_join(fb_settings.MEDIA_URL, value)
